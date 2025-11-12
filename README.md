@@ -1,16 +1,30 @@
-# my_app
+# 📱 Flutter Barcode Scanner UI
 
-A new Flutter project.
+This Flutter project is a **Barcode Scanner UI application** built using the Flutter framework.  
+It provides a simple and intuitive interface for scanning barcodes using the device camera.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 🚀 Features
 
-A few resources to get you started if this is your first Flutter project:
+- 📸 Scan barcodes in real-time using the camera  
+- 🧾 Display scanned barcode data instantly  
+- 🎨 Clean and responsive user interface  
+- ⚡ Built with Flutter for fast cross-platform performance  
+- 🔄 Easily extendable for product lookup or inventory management integrations  
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🛠️ Tech Stack
+
+- **Framework:** Flutter  
+- **Language:** Dart  
+- **Dependencies:**
+  - [`mobile_scanner`](https://pub.dev/packages/mobile_scanner) — for barcode scanning
+  - [`firebase_core` (optional)](https://pub.dev/packages/firebase_core) — if connected to Firebase
+  - [`cloud_firestore` (optional)](https://pub.dev/packages/cloud_firestore) — for data storage
+
+---
+
+## 📂 Project Structure
+
