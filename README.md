@@ -3,6 +3,7 @@
 This Flutter project is a **Barcode Scanner UI application** built using the Flutter framework.  
 It provides a simple and intuitive interface for scanning barcodes using the device camera.
 
+Youtube Link: https://youtu.be/i8FN00ZsM9s?si=RBeaPgCHyF1GRMiS
 ## 🛠️ Tech Stack
 
 - **Framework:** Flutter  
