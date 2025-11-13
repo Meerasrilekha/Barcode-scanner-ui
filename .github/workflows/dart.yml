@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      PUB_CACHE: ${{ runner.temp }}/.pub-cache
+      PUB_CACHE: $HOME/.pub-cache
 
     steps:
       - name: Checkout repository
@@ -25,7 +25,6 @@ jobs:
             pub-cache-${{ runner.os }}-
 
       - name: Install Flutter SDK
-        # subosito/flutter-action is a widely used community action that sets up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -43,14 +42,3 @@ jobs:
 
       - name: Run unit tests
         run: flutter test --coverage
-
-      # Optional: build an apk (uncomment if you want to produce an artifact)
-      # - name: Build debug APK
-      #   run: flutter build apk --debug
-
-      # Optional: upload build artifact
-      # - name: Upload APK
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: app-debug-apk
-      #     path: build/app/outputs/flutter-apk/app-debug.apk
