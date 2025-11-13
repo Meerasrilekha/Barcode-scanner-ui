@@ -28,6 +28,16 @@ dependencies:
   firebase_core: ^3.4.0
   cloud_firestore: ^5.4.4
 
+  # ✅ Additional packages for UI improvements
+  showcaseview: ^5.0.1
+  lottie: ^3.1.2
+  csv: ^6.0.0
+  connectivity_plus: ^6.0.5
+  share_plus: ^10.0.2
+  url_launcher: ^6.3.0
+  shared_preferences: ^2.3.2
+  permission_handler: ^11.3.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

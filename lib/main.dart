@@ -4,6 +4,17 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart'; // for Clipboard
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:csv/csv.dart';
+import 'package:lottie/lottie.dart';
+import 'package:showcaseview/showcaseview.dart';
+import 'theme.dart';
+import 'screens/settings_screen.dart';
+import 'screens/help_screen.dart';
 
 // IMPORTANT: Ensure firebase is configured (google-services.json / GoogleService-Info.plist).
 // Initialize Firebase before runApp.
@@ -13,26 +24,39 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _isDarkMode = false;
+
+  void _toggleTheme() {
+    setState(() {
+      _isDarkMode = !_isDarkMode;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Barcode Scanner + Firestore + Login',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-        useMaterial3: true,
-      ),
+      theme: _isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
       initialRoute: '/',
       routes: {
-        '/': (_) => const HomeScreen(),
+        '/': (_) => HomeScreen(toggleTheme: _toggleTheme, isDarkMode: _isDarkMode),
         '/scanner': (_) => const ScannerScreen(),
         '/result': (_) => const ResultScreen(),
         '/employees': (_) => const EmployeesScreen(),
         '/product_search': (_) => const ProductSearchScreen(),
         '/login': (_) => const LoginScreen(),
         '/dashboard': (_) => const DashboardScreen(),
+        '/settings': (_) => SettingsScreen(toggleTheme: _toggleTheme, isDarkMode: _isDarkMode),
+        '/help': (_) => const HelpScreen(),
       },
     );
   }
@@ -40,7 +64,10 @@ class MyApp extends StatelessWidget {
 
 /// Home screen with scanner & employees list entry points
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final VoidCallback toggleTheme;
+  final bool isDarkMode;
+
+  const HomeScreen({super.key, required this.toggleTheme, required this.isDarkMode});
 
   void _openProductSearch(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Opening Product Search...')));
@@ -76,6 +103,20 @@ class HomeScreen extends StatelessWidget {
             onPressed: () {
               debugPrint('Home: Login button pressed');
               Navigator.pushNamed(context, '/login');
+            },
+          ),
+          IconButton(
+            tooltip: 'Settings',
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.pushNamed(context, '/settings');
+            },
+          ),
+          IconButton(
+            tooltip: 'Help',
+            icon: const Icon(Icons.help),
+            onPressed: () {
+              Navigator.pushNamed(context, '/help');
             },
           ),
         ],
@@ -129,17 +170,29 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// ---------- SCANNER SCREEN (unchanged) ----------
+// ---------- SCANNER SCREEN (improved) ----------
 class ScannerScreen extends StatefulWidget {
   const ScannerScreen({super.key});
   @override
   State<ScannerScreen> createState() => _ScannerScreenState();
 }
 
-class _ScannerScreenState extends State<ScannerScreen> {
+class _ScannerScreenState extends State<ScannerScreen> with TickerProviderStateMixin {
   final MobileScannerController _controller = MobileScannerController();
   bool _scanning = true;
   String? _last;
+  late AnimationController _animationController;
+  late Animation<double> _borderAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true);
+    _borderAnimation = Tween<double>(begin: 2.0, end: 6.0).animate(_animationController);
+  }
 
   void _onDetect(BarcodeCapture capture) {
     if (!_scanning) return;
@@ -167,6 +220,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
   @override
   void dispose() {
+    _animationController.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -216,9 +270,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Scanner'),
-        backgroundColor: scheme.primary,
+        title: const Text('Scanner', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.black.withOpacity(0.3),
+        elevation: 0,
       ),
       body: Column(
         children: [
@@ -234,12 +290,34 @@ class _ScannerScreenState extends State<ScannerScreen> {
                   },
                 ),
                 Center(
+                  child: AnimatedBuilder(
+                    animation: _borderAnimation,
+                    builder: (context, child) {
+                      return Container(
+                        width: 280,
+                        height: 170,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white, width: _borderAnimation.value),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Positioned(
+                  bottom: 20,
+                  left: 20,
+                  right: 20,
                   child: Container(
-                    width: 280,
-                    height: 170,
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.white70, width: 2),
-                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.black.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      'Align the barcode within the frame',
+                      style: TextStyle(color: Colors.white, fontSize: 14),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),
