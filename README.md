@@ -10,5 +10,5 @@ Youtube Link: https://youtu.be/i8FN00ZsM9s?si=RBeaPgCHyF1GRMiS
 - **Language:** Dart  
 - **Dependencies:**
   - [`mobile_scanner`](https://pub.dev/packages/mobile_scanner) — for barcode scanning
-  - [`firebase_core` (optional)](https://pub.dev/packages/firebase_core) — if connected to Firebase
-  - [`cloud_firestore` (optional)](https://pub.dev/packages/cloud_firestore) — for data storage
+  - [`firebase_core`](https://pub.dev/packages/firebase_core) — if connected to Firebase
+  - [`cloud_firestore`](https://pub.dev/packages/cloud_firestore) — for data storage
